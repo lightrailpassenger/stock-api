@@ -22,7 +22,24 @@ router.get("/price-info", async (context) => {
       return;
     }
 
-    const tsStr = `${ts}`;
+    // TODO: Move the following logic to a separate util function,
+    // and further test it.
+    let tsStr = `${ts}`.toUpperCase();
+    const tsNum = tsStr.endsWith(".HK")
+      ? Number(tsStr.substring(0, tsStr.length - 3))
+      : Number(tsStr);
+
+    if (!Number.isNaN(tsNum)) {
+      const oldTsStr = tsStr;
+      tsStr = `${`${tsNum}`.padStart(4, 0)}.HK`;
+
+      if (oldTsStr !== tsStr) {
+        console.info(
+          `[Info] Auto adjusting ticker symbol from ${ts} to ${tsStr}`,
+        );
+      }
+    }
+
     const html = await fetchHtmlFromYahooFinance(tsStr);
     const info = parseInfo(html, tsStr);
 
@@ -33,7 +50,7 @@ router.get("/price-info", async (context) => {
       return;
     }
 
-    context.response.body = info;
+    context.response.body = { ts: tsStr, ...info };
     context.response.status = 200;
   } catch (err) {
     console.error(err);
