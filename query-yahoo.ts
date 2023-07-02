@@ -1,3 +1,5 @@
+import * as regexp from "regexp";
+
 const getUrlFromTickerSymbol = (ts: string) => {
   return `https://finance.yahoo.com/quote/${encodeURIComponent(ts)}?p=${
     encodeURIComponent(ts)
@@ -9,7 +11,7 @@ const FIREFOX_USER_AGENT =
 
 const fetchHtmlFromYahooFinance = async (
   ts: string,
-): Promise<string | null> => {
+): Promise<string> => {
   const url = getUrlFromTickerSymbol(ts);
   const result = await globalThis.fetch(url, {
     method: "GET",
@@ -18,34 +20,41 @@ const fetchHtmlFromYahooFinance = async (
     },
   });
 
-  return result.ok ? await result.text() : null;
+  if (!result.ok) {
+    throw new Error("Cannot fetch from Yahoo! Finance");
+  }
+
+  return await result.text();
 };
 
 type ParsedInfo = {
-  price: string;
-  absoluteChange: string;
-  relativeChange: string;
+  price: string | null;
+  currency: string | null;
+  absoluteChange: string | null;
+  relativeChange: string | null;
 };
 
 const parseInfo = (html: string, ts: string): ParsedInfo => {
   const priceRegex = new RegExp(
-    `<fin-streamer[^>]+data-symbol="${ts}"[^>]+data-test="qsp-price"[^>]+>([0-9\\.\\,]+)</fin-streamer>`,
+    `<fin-streamer[^>]+data-symbol="${regexp.escape(ts)}"[^>]+data-test="qsp-price"[^>]+>([0-9\\.\\,]+)</fin-streamer>`,
     "g",
   );
+  const currencyRegex = /Currency in ([^<]+)</g;
   const absoluteChangeRegex = new RegExp(
-    `<fin-streamer[^>]+data-symbol="${ts}" data-test="qsp-price-change"[^>]+><span[^>]+>([0-9\\-\\.\\,\\+]+)</span></fin-streamer>`,
+    `<fin-streamer[^>]+data-symbol="${regexp.escape(ts)}" data-test="qsp-price-change"[^>]+><span[^>]+>([0-9\\-\\.\\,\\+]+)</span></fin-streamer>`,
     "g",
   );
   const relativeChangeRegex = new RegExp(
-    `<fin-streamer[^>]+data-symbol="${ts}" data-field="regularMarketChangePercent"[^>]+><span[^>]+>\\(([0-9\\+\\-\\,\\.%]+)\\)</span></fin-streamer`,
+    `<fin-streamer[^>]+data-symbol="${regexp.escape(ts)}" data-field="regularMarketChangePercent"[^>]+><span[^>]+>\\(([0-9\\+\\-\\,\\.%]+)\\)</span></fin-streamer`,
     "g",
   );
 
-  const [[, price = ""] = []] = html.matchAll(priceRegex);
-  const [[, absoluteChange = ""] = []] = html.matchAll(absoluteChangeRegex);
-  const [[, relativeChange = ""] = []] = html.matchAll(relativeChangeRegex);
+  const [[, price = null] = []] = html.matchAll(priceRegex);
+  const [[, currency = null] = []] = html.matchAll(currencyRegex);
+  const [[, absoluteChange = null] = []] = html.matchAll(absoluteChangeRegex);
+  const [[, relativeChange = null] = []] = html.matchAll(relativeChangeRegex);
 
-  return { price, absoluteChange, relativeChange };
+  return { price, currency, absoluteChange, relativeChange };
 };
 
 export { fetchHtmlFromYahooFinance, parseInfo };

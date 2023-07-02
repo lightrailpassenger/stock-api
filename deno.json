@@ -1,4 +1,7 @@
 {
+  "compilerOptions": {
+    "strict": true
+  },
   "fmt": {
     "useTabs": false,
     "lineWidth": 80,
@@ -7,6 +10,7 @@
     "singleQuote": false
   },
   "imports": {
+    "regexp": "https://deno.land/std@0.192.0/regexp/mod.ts",
     "oak": "https://deno.land/x/oak@v11.1.0/mod.ts"
   }
 }

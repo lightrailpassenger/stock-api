@@ -6,7 +6,7 @@ const router = new Router();
 
 router.get("/health-check", (context) => {
   context.response.body = { res: "ok" };
-  context.response.statusCode = 200;
+  context.response.status = 200;
 });
 
 router.get("/price-info", async (context) => {
@@ -31,7 +31,7 @@ router.get("/price-info", async (context) => {
 
     if (!Number.isNaN(tsNum)) {
       const oldTsStr = tsStr;
-      tsStr = `${`${tsNum}`.padStart(4, 0)}.HK`;
+      tsStr = `${`${tsNum}`.padStart(4, "0")}.HK`;
 
       if (oldTsStr !== tsStr) {
         console.info(
@@ -64,7 +64,7 @@ const app = new Application();
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-const PORT = Deno.env.get("PORT") ?? 3000;
+const PORT = Number(Deno.env.get("PORT")) || 3000;
 console.log(`Listening at port: ${PORT}`);
 
 await app.listen({ port: PORT });
