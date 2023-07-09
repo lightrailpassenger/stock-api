@@ -36,16 +36,22 @@ type ParsedInfo = {
 
 const parseInfo = (html: string, ts: string): ParsedInfo => {
   const priceRegex = new RegExp(
-    `<fin-streamer[^>]+data-symbol="${regexp.escape(ts)}"[^>]+data-test="qsp-price"[^>]+>([0-9\\.\\,]+)</fin-streamer>`,
+    `<fin-streamer[^>]+data-symbol="${
+      regexp.escape(ts)
+    }"[^>]+data-test="qsp-price"[^>]+>([0-9\\.\\,]+)</fin-streamer>`,
     "g",
   );
   const currencyRegex = /Currency in ([^<]+)</g;
   const absoluteChangeRegex = new RegExp(
-    `<fin-streamer[^>]+data-symbol="${regexp.escape(ts)}" data-test="qsp-price-change"[^>]+><span[^>]+>([0-9\\-\\.\\,\\+]+)</span></fin-streamer>`,
+    `<fin-streamer[^>]+data-symbol="${
+      regexp.escape(ts)
+    }" data-test="qsp-price-change"[^>]+><span[^>]+>([0-9\\-\\.\\,\\+]+)</span></fin-streamer>`,
     "g",
   );
   const relativeChangeRegex = new RegExp(
-    `<fin-streamer[^>]+data-symbol="${regexp.escape(ts)}" data-field="regularMarketChangePercent"[^>]+><span[^>]+>\\(([0-9\\+\\-\\,\\.%]+)\\)</span></fin-streamer`,
+    `<fin-streamer[^>]+data-symbol="${
+      regexp.escape(ts)
+    }" data-field="regularMarketChangePercent"[^>]+><span[^>]+>\\(([0-9\\+\\-\\,\\.%]+)\\)</span></fin-streamer`,
     "g",
   );
 
