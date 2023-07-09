@@ -1,6 +1,7 @@
 import { Application, Router } from "oak";
 
 import { fetchHtmlFromYahooFinance, parseInfo } from "./query-yahoo.ts";
+import { rectifyTickerSymbol } from "./ticker-util.ts";
 
 const router = new Router();
 
@@ -22,26 +23,16 @@ router.get("/price-info", async (context) => {
       return;
     }
 
-    // TODO: Move the following logic to a separate util function,
-    // and further test it.
-    let tsStr = `${ts}`.toUpperCase();
-    const tsNum = tsStr.endsWith(".HK")
-      ? Number(tsStr.substring(0, tsStr.length - 3))
-      : Number(tsStr);
+    const actualTs = rectifyTickerSymbol(ts);
 
-    if (!Number.isNaN(tsNum)) {
-      const oldTsStr = tsStr;
-      tsStr = `${`${tsNum}`.padStart(4, "0")}.HK`;
-
-      if (oldTsStr !== tsStr) {
-        console.info(
-          `[Info] Auto adjusting ticker symbol from ${ts} to ${tsStr}`,
-        );
-      }
+    if (actualTs !== ts) {
+      console.info(
+        `[Info] Auto adjusting ticker symbol from ${ts} to ${actualTs}`,
+      );
     }
 
-    const html = await fetchHtmlFromYahooFinance(tsStr);
-    const info = parseInfo(html, tsStr);
+    const html = await fetchHtmlFromYahooFinance(actualTs);
+    const info = parseInfo(html, actualTs);
 
     if (!(info.price || info.relativeChange || info.absoluteChange)) {
       context.response.body = { err: "NOT_FOUND" };
@@ -50,7 +41,7 @@ router.get("/price-info", async (context) => {
       return;
     }
 
-    context.response.body = { ts: tsStr, ...info };
+    context.response.body = { ts: actualTs, ...info };
     context.response.status = 200;
   } catch (err) {
     console.error(err);
