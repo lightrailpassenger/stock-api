@@ -5,7 +5,7 @@ An API that provides stock, bond and ETF information.
 ## To run
 
 ```bash
-PORT=3000 deno --allow-env --allow-net app.ts
+PORT=3000 deno run --allow-env --allow-net app.ts
 ```
 
 ## To query
