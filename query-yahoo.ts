@@ -38,14 +38,15 @@ const parseInfo = (html: string, ts: string): ParsedInfo => {
   const priceRegex = new RegExp(
     `<fin-streamer[^>]+data-symbol="${
       regexp.escape(ts)
-    }"[^>]+data-test="qsp-price"[^>]+>([0-9\\.\\,]+)</fin-streamer>`,
+    }"[^>]+data-testid="qsp-price"[^>]+><span>([0-9\\.\\,]+)</span></fin-streamer>`,
     "g",
   );
-  const currencyRegex = /Currency in ([^<]+)</g;
+  const currencyRegex =
+    /<i aria-hidden="true" data-svelte-h="svelte-sg6bkb">•<\/i> <span>([^<]{3})</g;
   const absoluteChangeRegex = new RegExp(
     `<fin-streamer[^>]+data-symbol="${
       regexp.escape(ts)
-    }" data-test="qsp-price-change"[^>]+><span[^>]+>([0-9\\-\\.\\,\\+]+)</span></fin-streamer>`,
+    }" data-testid="qsp-price-change"[^>]+><span[^>]+>([0-9\\-\\.\\,\\+]+)</span></fin-streamer>`,
     "g",
   );
   const relativeChangeRegex = new RegExp(
