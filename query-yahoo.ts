@@ -1,5 +1,7 @@
 import * as regexp from "regexp";
 
+import curl from "./curl.ts";
+
 const getUrlFromTickerSymbol = (ts: string) => {
   return `https://finance.yahoo.com/quote/${encodeURIComponent(ts)}/`;
 };
@@ -11,18 +13,14 @@ const fetchHtmlFromYahooFinance = async (
   ts: string,
 ): Promise<string> => {
   const url = getUrlFromTickerSymbol(ts);
-  const result = await globalThis.fetch(url, {
+  const result = await curl(url, {
     method: "GET",
     headers: {
       "User-Agent": FIREFOX_USER_AGENT,
     },
   });
 
-  if (!result.ok) {
-    throw new Error("Cannot fetch from Yahoo! Finance");
-  }
-
-  return await result.text();
+  return result;
 };
 
 type ParsedInfo = {
