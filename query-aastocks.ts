@@ -26,7 +26,15 @@ const fetchDividendHtmlFromAASTOCKS = async (ts: string): string => {
   }
 
   const url = getUrlFromTickerSymbol(numTs);
-  const result = await globalThis.fetch(url, { method: "GET" });
+  const result = await globalThis.fetch(
+    url,
+    {
+      method: "GET",
+      headers: {
+        "Cookie": "__utmt_a3=1; __utmt_a2=1; AALTP=1",
+      },
+    },
+  );
 
   if (!result.ok) {
     throw Object.assign(new Error("Cannot fetch from AASTOCKS"), {
