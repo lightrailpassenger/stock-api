@@ -38,7 +38,7 @@ const parseInfo = (html: string, ts: string): ParsedInfo => {
     "g",
   );
   const currencyRegex =
-    /<i aria-hidden="true" data-svelte-h="svelte-sg6bkb">•<\/i> <span>([^<]{3})</g;
+    /<span aria-hidden="true" data-svelte-h="svelte-jnvkjn">•<\/span> <span>([^<]{3})</g;
   const absoluteChangeRegex = new RegExp(
     `<fin-streamer[^>]+data-symbol="${
       regexp.escape(ts)
