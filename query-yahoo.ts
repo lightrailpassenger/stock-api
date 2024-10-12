@@ -1,9 +1,7 @@
 import * as regexp from "regexp";
 
 const getUrlFromTickerSymbol = (ts: string) => {
-  return `https://finance.yahoo.com/quote/${encodeURIComponent(ts)}?p=${
-    encodeURIComponent(ts)
-  }&tsrc=fin-srch`;
+  return `https://finance.yahoo.com/quote/${encodeURIComponent(ts)}/`;
 };
 
 const FIREFOX_USER_AGENT =
