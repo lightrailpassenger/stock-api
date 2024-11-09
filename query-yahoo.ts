@@ -1,26 +1,16 @@
-import * as regexp from "regexp";
-
-import curl from "./curl.ts";
-
 const getUrlFromTickerSymbol = (ts: string) => {
-  return `https://finance.yahoo.com/quote/${encodeURIComponent(ts)}/`;
+  return `https://query1.finance.yahoo.com/v8/finance/chart/${
+    encodeURIComponent(ts)
+  }?interval=1m&includePrePost=true&events=div%7Csplit%7Cearn&&lang=en-US&region=US`;
 };
-
-const FIREFOX_USER_AGENT =
-  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/114.0" as const;
 
 const fetchHtmlFromYahooFinance = async (
   ts: string,
-): Promise<string> => {
+): Promise<object> => {
   const url = getUrlFromTickerSymbol(ts);
-  const result = await curl(url, {
-    method: "GET",
-    headers: {
-      "User-Agent": FIREFOX_USER_AGENT,
-    },
-  });
+  const res = await fetch(url);
 
-  return result;
+  return await res.json();
 };
 
 type ParsedInfo = {
@@ -30,34 +20,27 @@ type ParsedInfo = {
   relativeChange: string | null;
 };
 
-const parseInfo = (html: string, ts: string): ParsedInfo => {
-  const priceRegex = new RegExp(
-    `<fin-streamer[^>]+data-symbol="${
-      regexp.escape(ts)
-    }"[^>]+data-testid="qsp-price"[^>]+><span>([0-9\\.\\,]+)</span></fin-streamer>`,
-    "g",
+// deno-lint-ignore no-explicit-any
+const parseInfo = (obj: any): ParsedInfo => {
+  const { meta } = obj.chart.result[0];
+  const {
+    currency,
+    regularMarketPrice,
+    previousClose,
+  } = meta;
+  const absoluteChange = Number(
+    Number(regularMarketPrice - previousClose).toFixed(5),
   );
-  const currencyRegex =
-    /<span aria-hidden="true" data-svelte-h="svelte-jnvkjn">•<\/span> <span>([^<]{3})</g;
-  const absoluteChangeRegex = new RegExp(
-    `<fin-streamer[^>]+data-symbol="${
-      regexp.escape(ts)
-    }" data-testid="qsp-price-change"[^>]+><span[^>]+>([0-9\\-\\.\\,\\+]+)</span></fin-streamer>`,
-    "g",
-  );
-  const relativeChangeRegex = new RegExp(
-    `<fin-streamer[^>]+data-symbol="${
-      regexp.escape(ts)
-    }" data-field="regularMarketChangePercent"[^>]+><span[^>]+>\\(([0-9\\+\\-\\,\\.%]+)\\)</span></fin-streamer`,
-    "g",
-  );
+  const relativeChange = `${
+    Number(100 * absoluteChange / previousClose).toFixed(2)
+  }%`;
 
-  const [[, price = null] = []] = html.matchAll(priceRegex);
-  const [[, currency = null] = []] = html.matchAll(currencyRegex);
-  const [[, absoluteChange = null] = []] = html.matchAll(absoluteChangeRegex);
-  const [[, relativeChange = null] = []] = html.matchAll(relativeChangeRegex);
-
-  return { price, currency, absoluteChange, relativeChange };
+  return {
+    price: regularMarketPrice,
+    currency,
+    absoluteChange,
+    relativeChange,
+  };
 };
 
 export { fetchHtmlFromYahooFinance, parseInfo };
