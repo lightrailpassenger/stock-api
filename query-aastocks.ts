@@ -54,10 +54,8 @@ const currencySymbolToFirstCharacterRegex = {
 } as const;
 const dividendRegex = new RegExp(
   `\\s*<td class="[^"]+">(?<year>20[0-9][0-9])/(?<date>[0-9]{2}/[0-9]{2})[^${
-    regexp.escape("普")
-  }]*${regexp.escape("普通股息")}</a>[\x00-\x7f]*${
-    regexp.escape("：")
-  }?(?<currency>[${
+    regexp.escape("股")
+  }]*${regexp.escape("股息")}[\x00-\x7f]*${regexp.escape("：")}?(?<currency>[${
     Object.values(currencySymbolToFirstCharacterRegex).map((
       c,
     ) => (regexp.escape(c)))
