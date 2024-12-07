@@ -1,4 +1,4 @@
-import { Application, Router } from "oak";
+import { Application, Router } from "@oak/oak";
 
 import { fetchHtmlFromYahooFinance, parseInfo } from "./query-yahoo.ts";
 import {
