@@ -1,4 +1,4 @@
-import { assertEquals } from "asserts";
+import { assertEquals } from "@std/assert";
 
 import { rectifyTickerSymbol } from "../ticker-util.ts";
 

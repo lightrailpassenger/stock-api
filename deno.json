@@ -10,8 +10,8 @@
     "singleQuote": false
   },
   "imports": {
-    "asserts": "https://deno.land/std@0.192.0/testing/asserts.ts",
-    "regexp": "https://deno.land/std@0.192.0/regexp/mod.ts",
+    "@std/assert": "jsr:@std/assert@^1.0.9",
+    "@std/regexp": "jsr:@std/regexp@^1.0.0",
     "oak": "https://deno.land/x/oak@v11.1.0/mod.ts"
   }
 }

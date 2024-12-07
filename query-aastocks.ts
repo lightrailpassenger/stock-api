@@ -1,4 +1,4 @@
-import * as regexp from "regexp";
+import * as regexp from "@std/regexp";
 
 const getUrlFromTickerSymbol = (ts: string): string => {
   return `http://www.aastocks.com/tc/stocks/analysis/dividend.aspx?symbol=${
